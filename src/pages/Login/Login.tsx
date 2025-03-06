@@ -1,6 +1,34 @@
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import * as yup from 'yup';
+import FormInput from '../../components/FormInput/FormInput';
+
+const loginSchema = yup.object().shape({
+    email: yup.string().email('Email tidak valid').required('Email wajib diisi'),
+    password: yup.string().required('Password wajib diisi').min(6, 'Password minimal 6 karaketer'),
+})
+
+interface LoginFormValues {
+    email: string;
+    password: string;
+}
 
 const Login = () => {
+    const form = useForm<LoginFormValues>({
+        resolver: yupResolver(loginSchema),
+    });
+
+    const submitHandler = (values: LoginFormValues) => {
+        console.log(values)
+        Swal.fire({
+            icon: 'success',
+            title: 'Login sukses',
+            confirmButtonText: 'Ok'
+        })
+    }
+
     return (
         <div className="login-section">
             <div className="container">
@@ -8,13 +36,21 @@ const Login = () => {
                     <div className="col-md-6 col-lg-5">
                         <div className="login-wrap p-4">
                             <h2 className="section-title text-center mb-5">Masuk</h2>
-                            <form action="#" className="login-form">
-                                <div className="form-group mb-4">
-                                    <input type="email" className="form-control" placeholder="Alamat Email" required />
-                                </div>
-                                <div className="form-group mb-4">
-                                    <input type="password" className="form-control" placeholder="Kata Sandi" required />
-                                </div>
+                            <form onSubmit={form.handleSubmit(submitHandler)} className="login-form">
+                                <FormInput<LoginFormValues>
+                                    errors={form.formState.errors}
+                                    name='email'
+                                    register={form.register}
+                                    type='text'
+                                    placeholder='Alamat Email'
+                                />
+                                <FormInput<LoginFormValues>
+                                    errors={form.formState.errors}
+                                    name='password'
+                                    register={form.register}
+                                    type='text'
+                                    placeholder='Kata Sandi'
+                                />
                                 <div className="form-group">
                                     <button type="submit" className="btn btn-primary btn-block">Masuk</button>
                                 </div>
