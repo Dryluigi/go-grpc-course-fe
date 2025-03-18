@@ -26,6 +26,7 @@ import AdminDashboardSection from './components/AdminDashboardSection/AdminDashb
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/auth';
 import { getAuthClient } from './api/grpc/client';
+import AdminEditProduct from './pages/AdminEditProduct/AdminEditProduct';
 
 const router = createBrowserRouter([
     {
@@ -81,6 +82,7 @@ const router = createBrowserRouter([
             },
             { path: "order", element: <AdminOrderDetail /> },
             { path: "products/create", element: <AdminCreateProduct /> },
+            { path: "products/:id/edit", element: <AdminEditProduct /> },
         ]
     }
 ])
