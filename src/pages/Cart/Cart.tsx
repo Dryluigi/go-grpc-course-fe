@@ -19,6 +19,7 @@ interface CartItem {
 function Cart() {
     const listApi = useGrpcApi();
     const deleteApi = useGrpcApi();
+    const updateQuantityApi = useGrpcApi();
     const [items, setItems] = useState<CartItem[]>([]);
     const [totalPrice, setTotalPrice] = useState<number>(0);
 
@@ -47,6 +48,36 @@ function Cart() {
             cartId: cartId,
         }));
         await fetchData();
+    }
+
+    const updateCartQuantityHandler = async (cartId: string, action: "increment" | "decrement") => {
+        let newQuantity = 0;
+        let newItems = items.map(item => {
+            if (item.id === cartId) {
+                newQuantity = action == "decrement" ? item.quantity - 1 : item.quantity + 1
+
+                return {
+                    ...item,
+                    quantity: newQuantity,
+                    total: item.product_price * newQuantity
+                }
+            }
+
+            return item;
+        });
+        newItems = newItems.filter(item => item.quantity > 0)
+
+        setItems(newItems);
+        setTotalPrice(newItems.reduce<number>((currentValue, item) => currentValue + item.total, 0));
+
+        if (newQuantity < 0) {
+            return
+        }
+
+        await updateQuantityApi.callApi(getCartClient().updateCartQuantity({
+            cartId: cartId,
+            newQuantity: BigInt(newQuantity)
+        }))
     }
 
     return (
@@ -82,11 +113,23 @@ function Cart() {
                                                 <td>
                                                     <div className="input-group mb-3 d-flex align-items-center quantity-container" style={{ maxWidth: 120 }}>
                                                         <div className="input-group-prepend">
-                                                            <button className="btn btn-outline-black decrease" type="button">-</button>
+                                                            <button
+                                                                className="btn btn-outline-black decrease"
+                                                                type="button"
+                                                                onClick={() => updateCartQuantityHandler(item.id, "decrement")}
+                                                            >
+                                                                -
+                                                            </button>
                                                         </div>
                                                         <input type="text" className="form-control text-center quantity-amount" value={item.quantity} disabled />
                                                         <div className="input-group-append">
-                                                            <button className="btn btn-outline-black increase" type="button">+</button>
+                                                            <button
+                                                                className="btn btn-outline-black increase"
+                                                                type="button"
+                                                                onClick={() => updateCartQuantityHandler(item.id, "increment")}
+                                                            >
+                                                                +
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </td>
