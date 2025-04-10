@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/auth';
 import { getAuthClient } from './api/grpc/client';
 import AdminEditProduct from './pages/AdminEditProduct/AdminEditProduct';
+import OrderDetailSection from './components/OrderDetailSection/OrderDetailSection';
 
 const router = createBrowserRouter([
     {
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
                 children: [
                     { path: 'change-password', element: <ChangePasswordSection /> },
                     { path: 'orders', element: <OrderHistorySection /> },
+                    { path: 'orders/:id/detail', element: <OrderDetailSection /> },
                 ]
             },
             { path: '*', element: <NotFound /> },
