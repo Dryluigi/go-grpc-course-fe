@@ -30,8 +30,6 @@ function OrderDetailSection() {
     }, []);
 
     const updateStatusHandler = async () => {
-        console.log(newStatusCode);
-
         await updateStatusApi.callApi(getOrderClient().updateOrderStatus({
             newStatusCode: newStatusCode,
             orderId: id ?? "",
